@@ -1,46 +1,20 @@
 <template>
-  <div class="container">
-    <component :is="currentPageComponent" :page-params="currentPageParams" />
+  <div>
+    <headerComp />
+    <router-view />
+    <footerComp />
   </div>
 </template>
 
 <script>
-import MainPage from './pages/MainPage.vue';
-import ProductPage from './pages/ProductPage.vue';
-import NotFound from './pages/NotFoundPage.vue';
-import eventBus from './eventBus';
-
-const routes = {
-  main: 'MainPage',
-  product: 'ProductPage',
-};
+import headerComp from './components/header.vue';
+import footerComp from './components/footer.vue';
 
 export default {
   name: 'App',
   components: {
-    MainPage,
-    ProductPage,
-    NotFound,
-  },
-  data() {
-    return {
-      currentPage: 'main',
-      currentPageParams: {},
-    };
-  },
-  methods: {
-    goToPage(pageName, pageParams) {
-      this.currentPage = pageName;
-      this.currentPageParams = pageParams;
-    },
-  },
-  computed: {
-    currentPageComponent() {
-      return routes[this.currentPage] || 'NotFoundPage';
-    },
-  },
-  created() {
-    eventBus.$on('goToPage', (pageName, pageParams) => this.goToPage(pageName, pageParams));
+    headerComp,
+    footerComp,
   },
 };
 
