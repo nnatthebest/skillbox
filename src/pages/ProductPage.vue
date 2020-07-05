@@ -103,7 +103,7 @@
             <div class="item__row">
               <div class="form__counter">
                 <button type="button" aria-label="Убрать один товар"
-                  :disabled="productAmount === 1" @click="minusAmount">
+                  :disabled="productAmount <= 1" @click="minusAmount">
                   <svg width="12" height="12" fill="currentColor">
                     <use xlink:href="#icon-minus"></use>
                   </svg>
