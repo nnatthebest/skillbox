@@ -220,7 +220,10 @@ export default {
   methods: {
     goToPage,
     addToCart() {
-      this.$store.commit('addProductToCart', { productId: this.product.id, amount: this.productAmount });
+      this.$store.dispatch('addProductItem', {
+        productId: this.product.id,
+        amount: this.productAmount,
+      });
     },
     addAmount() {
       this.productAmount += 1;
