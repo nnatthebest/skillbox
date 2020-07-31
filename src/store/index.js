@@ -1,40 +1,76 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import products from '@/data/products';
+import axios from 'axios';
+import config from '@/config';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     cartProducts: [],
+    userAccessKey: null,
+    cartProductsData: [],
   },
   mutations: {
-    addProductToCart(state, { productId, amount, productInfo }) {
-      state.cartProducts.push({
-        productId,
-        amount,
-        productInfo,
-      });
-    },
-  },
-  actions: {
-    addProductItem({ commit, state }, { productId, amount }) {
+    addProductToCart(state, { productId, amount }) {
       const item = state.cartProducts.find((product) => product.productId === productId);
       if (item) {
         item.amount += amount;
       } else {
-        const productInfo = products.find((element) => element.id === productId);
-        commit('addProductToCart', { productId, amount, productInfo });
+        state.cartProducts.push({
+          productId,
+          amount,
+        });
       }
+    },
+    updateUserAccessKey(state, accessKey) {
+      state.userAccessKey = accessKey;
+    },
+    updateProductsData(state, items) {
+      state.cartProductsData = items;
+    },
+    syncCartProducts(state) {
+      state.cartProducts = state.cartProductsData.map((item) => ({
+        productId: item.product.id,
+        amount: item.quantity,
+      }));
+    },
+  },
+  actions: {
+    loadCart(context) {
+      axios
+        .get(`${config}/api/baskets`, {
+          params: {
+            userAccessKey: context.state.userAccessKey,
+          },
+        })
+        .then((response) => {
+          if (!context.state.userAccessKsey) {
+            localStorage.setItem('userAccessKey', response.data.user.accessKey);
+            context.commit('updateUserAccessKey', response.data.user.accessKey);
+          }
+          context.commit('updateProductsData', response.data.items);
+          context.commit('syncCartProducts');
+        });
     },
   },
   getters: {
-    countPrice(state) {
-      let currentPrice = 0;
-      state.cartProducts.forEach((element) => {
-        currentPrice += (element.amount * element.productInfo.price);
+    cartDetailProducts(state) {
+      return state.cartProducts.map((item) => {
+        const { product } = state.cartProductsData
+          .find((p) => p.productId === item.productId);
+        return {
+          ...item,
+          product: {
+            ...product,
+            img: product.image.file.url,
+          },
+        };
       });
-      return currentPrice;
+    },
+    cartTotalPrice(state, getters) {
+      return getters.cartDetailProducts
+        .reduce((acc, item) => (item.product.price * item.amount) + acc, 0);
     },
   },
 });

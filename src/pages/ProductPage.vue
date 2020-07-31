@@ -1,6 +1,9 @@
 <template>
   <main class="content container">
-    <div class="content__top">
+    <div v-if="productLoading">Загрузка товара</div>
+    <div v-else-if="!productData">Не удалось загрузить товар товар</div>
+    <div v-else>
+      <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
           <router-link class="breadcrumbs__link" :to="{ name: 'main' }">
@@ -23,7 +26,7 @@
     <section class="item">
       <div class="item__pics pics">
         <div class="pics__wrapper">
-          <img width="570" height="570" :src="product.img"
+          <img width="570" height="570" :src="product.image"
             :alt="product.title">
         </div>
       </div>
@@ -190,12 +193,13 @@
         </div>
       </div>
     </section>
+    </div>
   </main>
 </template>
 
 <script>
-import products from '@/data/products';
-import categorys from '@/data/categories';
+import axios from 'axios';
+import config from '@/config';
 import goToPage from '@/helpers/goToPage';
 import numberFormat from '@/helpers/numberFormat';
 
@@ -204,6 +208,9 @@ export default {
   data() {
     return {
       productAmount: 1,
+      productData: null,
+      productLoading: false,
+      productLoadingError: false,
     };
   },
   filters: {
@@ -211,16 +218,19 @@ export default {
   },
   computed: {
     product() {
-      return products.find((product) => product.id === +this.$route.params.id);
+      const image = this.productData.image.file.url;
+      const product = this.productData;
+      product.image = image;
+      return product;
     },
     category() {
-      return categorys.find((category) => category.id === this.product.categoryId);
+      return this.productData.category;
     },
   },
   methods: {
     goToPage,
     addToCart() {
-      this.$store.dispatch('addProductItem', {
+      this.$store.commit('addProductToCart', {
         productId: this.product.id,
         amount: this.productAmount,
       });
@@ -230,6 +240,22 @@ export default {
     },
     minusAmount() {
       this.productAmount -= 1;
+    },
+    loadProduct() {
+      this.productLoading = true;
+      this.productLoadingError = false;
+      axios.get(`${config}/api/products/${this.$route.params.id}`)
+        .then((response) => { this.productData = response.data; })
+        .catch(() => { this.productLoadingError = true; })
+        .then(() => { this.productLoading = false; });
+    },
+  },
+  watch: {
+    '$route.params.id': {
+      handler() {
+        this.loadProduct();
+      },
+      immediate: true,
     },
   },
 };

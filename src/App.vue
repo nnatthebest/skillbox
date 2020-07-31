@@ -7,14 +7,26 @@
 </template>
 
 <script>
-import headerComp from './components/header.vue';
-import footerComp from './components/footer.vue';
+import { mapActions, mapMutations } from 'vuex';
+import headerComp from '@/components/headerComp.vue';
+import footerComp from '@/components/footerComp.vue';
 
 export default {
   name: 'App',
   components: {
     headerComp,
     footerComp,
+  },
+  methods: {
+    ...mapActions(['loadCart']),
+    ...mapMutations(['updateUserAccessKey']),
+  },
+  created() {
+    const userAccessKey = localStorage.getItem('userAccessKey');
+    if (userAccessKey) {
+      this.updateUserAccessKey(userAccessKey);
+    }
+    this.loadCart();
   },
 };
 

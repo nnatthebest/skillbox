@@ -103,10 +103,10 @@ export default {
   },
   computed: {
     cartProduct() {
-      return this.$store.state.cartProducts;
+      return this.$store.getters.cartDetailProducts;
     },
     cartPrice() {
-      return this.$store.getters.countPrice;
+      return this.$store.getters.cartTotalPrice;
     },
   },
 };

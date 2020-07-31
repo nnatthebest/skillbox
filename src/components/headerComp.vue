@@ -18,7 +18,7 @@
 import CartIndicator from '@/components/CartIndicator.vue';
 
 export default {
-  name: 'header',
+  name: 'headerComp',
   components: {
     CartIndicator,
   },

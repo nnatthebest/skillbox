@@ -13,6 +13,9 @@
     <ProductFilter :categoryId.sync="filterCategoryId" :priceFrom.sync="filterPriceFrom"
       :priceTo.sync="filterPriceTo" />
     <section class="catalog">
+      <div v-if="productsLoading" class="loader">Загрузка товаров...</div>
+      <div v-if="productsLoadingFailed">Произошла ошибка при загрузке товаров
+          <button @click.prevent="loadProducts">Попробовать еще раз</button></div>
       <ProductList :products="products" />
 
       <BaseProducts v-model="page" :count="countProducts" :per-page="productPerPage" />
@@ -22,10 +25,11 @@
 </template>
 
 <script>
-import products from '@/data/products';
+import config from '@/config';
 import ProductList from '@/components/ProductList.vue';
 import BaseProducts from '@/components/BasePagination.vue';
 import ProductFilter from '@/components/ProductFilter.vue';
+import axios from 'axios';
 
 export default {
   name: 'MainPage',
@@ -41,32 +45,62 @@ export default {
       filterCategoryId: 0,
       productPerPage: 3,
       page: 1,
+      productsData: null,
+      productsLoading: false,
+      productsLoadingFailed: false,
     };
   },
   computed: {
-    filteredProducts() {
-      let filteredProducts = products;
-      if (this.filterPriceFrom > 0) {
-        filteredProducts = filteredProducts.filter((product) => product.price > this
-          .filterPriceFrom);
-      }
-      if (this.filterPriceTo > 0) {
-        filteredProducts = filteredProducts.filter((product) => product.price < this
-          .filterPriceTo);
-      }
-      if (this.filterCategoryId > 0) {
-        filteredProducts = filteredProducts.filter((product) => product.categoryId === this
-          .filterCategoryId);
-      }
-      return filteredProducts;
-    },
     products() {
-      const offset = (this.page - 1) * this.productPerPage;
-      return this.filteredProducts.slice(offset, offset + this.productPerPage);
+      return this.productsData
+        ? this.productsData.items.map((product) => ({
+          ...product,
+          img: product.image.file.url,
+        }))
+        : [];
     },
     countProducts() {
-      return this.filteredProducts.length;
+      return this.productsData ? this.productsData.pagination.total : 0;
     },
+  },
+  methods: {
+    loadProducts() {
+      this.productsLoading = true;
+      this.productsLoadingFailed = false;
+      clearTimeout(this.loadProductsTimer);
+      this.loadProductsTimer = setTimeout(() => {
+        axios
+          .get(`${config}/api/products`, {
+            params: {
+              page: this.page,
+              limit: this.productPerPage,
+              categoryId: this.filterCategoryId,
+              minPrice: this.filterPriceFrom,
+              maxPrice: this.filterPriceTo,
+            },
+          })
+          .then((response) => { this.productsData = response.data; })
+          .catch(() => { this.productsLoadingFailed = true; })
+          .then(() => { this.productsLoading = false; });
+      }, 0);
+    },
+  },
+  watch: {
+    page() {
+      this.loadProducts();
+    },
+    filterPriceFrom() {
+      this.loadProducts();
+    },
+    filterPriceTo() {
+      this.loadProducts();
+    },
+    filterCategoryId() {
+      this.loadProducts();
+    },
+  },
+  created() {
+    this.loadProducts();
   },
 };
 
