@@ -28,7 +28,7 @@
           <ul class="cart__list">
             <li class="cart__item product" v-for="item in cartProduct" :key="item.productId">
               <div class="product__pic">
-                <img :src="item.productInfo.img" width="120" height="120"
+                <img :src="item.productInfo.image" width="120" height="120"
                   :alt="item.productInfo.title">
               </div>
               <h3 class="product__title">
@@ -48,7 +48,8 @@
                   </svg>
                 </button>
 
-                <input type="text" v-model="item.amount" name="count">
+                <input type="text" v-model.number="item.amount"
+                  @change="changeAmount(item.productId, $event.target.value)" name="count">
 
                 <button type="button" aria-label="Добавить один товар">
                   <svg width="10" height="10" fill="currentColor">
@@ -93,13 +94,16 @@ import numberFormat from '@/helpers/numberFormat';
 
 export default {
   name: 'CartPage',
-  data() {
-    return {
-      cartProducts: [],
-    };
-  },
   filters: {
     numberFormat,
+  },
+  methods: {
+    changeAmount(productId, amount) {
+      this.$store.commit('updateCartProductAmount', {
+        productId,
+        amount,
+      });
+    },
   },
   computed: {
     cartProduct() {
