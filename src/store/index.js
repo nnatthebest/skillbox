@@ -52,8 +52,8 @@ export default new Vuex.Store({
         });
     },
     addProductToCart(context, { productId, amount }) {
-      return setTimeout(() => {
-        axios.post(`${config}/api/baskets/products`, {
+      return (new Promise((resolve) => setTimeout(resolve, 2000))).axios
+        .post(`${config}/api/baskets/products`, {
           productId,
           quantity: amount,
         }, {
@@ -61,11 +61,10 @@ export default new Vuex.Store({
             userAccessKey: context.state.userAccessKey,
           },
         })
-          .then((response) => {
-            context.commit('updateProductsData', response.data.items);
-            context.commit('syncCartProducts');
-          });
-      }, 2000);
+        .then((response) => {
+          context.commit('updateProductsData', response.data.items);
+          context.commit('syncCartProducts');
+        });
     },
   },
   getters: {
