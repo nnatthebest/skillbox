@@ -19,4 +19,4 @@ export default [
     id: 5,
     title: 'Домашний уют',
   },
-];
+]

@@ -83,4 +83,4 @@ export default [
     price: 880,
     img: '/img/soundpad.jpg',
   },
-];
+]

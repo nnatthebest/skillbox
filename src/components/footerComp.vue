@@ -95,6 +95,5 @@
 <script>
 export default {
   name: 'footerComp',
-};
-
+}
 </script>

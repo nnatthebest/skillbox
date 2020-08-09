@@ -7,9 +7,9 @@
 </template>
 
 <script>
-import { mapActions, mapMutations } from 'vuex';
-import headerComp from '@/components/headerComp.vue';
-import footerComp from '@/components/footerComp.vue';
+import { mapActions, mapMutations } from 'vuex'
+import headerComp from '@/components/headerComp.vue'
+import footerComp from '@/components/footerComp.vue'
 
 export default {
   name: 'App',
@@ -22,14 +22,13 @@ export default {
     ...mapMutations(['updateUserAccessKey']),
   },
   created() {
-    const userAccessKey = localStorage.getItem('userAccessKey');
+    const userAccessKey = localStorage.getItem('userAccessKey')
     if (userAccessKey) {
-      this.updateUserAccessKey(userAccessKey);
+      this.updateUserAccessKey(userAccessKey)
     }
-    this.loadCart();
+    this.loadCart()
   },
-};
-
+}
 </script>
 
 <style lang="sass">
