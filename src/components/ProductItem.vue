@@ -12,12 +12,7 @@
 
     <span class="catalog__price"> {{ product.price | numberFormat }} ₽ </span>
     <ul class="colors colors--black">
-      <li class="colors__item">
-        <label for="" class="colors__label">
-          <input type="radio" class="colors__radio sr-only" v-model="color" />
-          <span class="colors__value"></span>
-        </label>
-      </li>
+      <ProductColorVue v-for="item in product.colors" :key="item.id" :color="item" />
     </ul>
   </li>
 </template>
@@ -25,9 +20,13 @@
 <script>
 import goToPage from '@/helpers/goToPage'
 import numberFormat from '@/helpers/numberFormat'
+import ProductColorVue from './ProductColor.vue'
 
 export default {
   name: 'ProductItem',
+  components: {
+    ProductColorVue,
+  },
   props: ['product'],
   data() {
     return {
