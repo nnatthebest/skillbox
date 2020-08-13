@@ -3,9 +3,11 @@
     <div class="product__pic">
       <img :src="item.productInfo.image" width="120" height="120" :alt="item.productInfo.title" />
     </div>
-    <h3 class="product__title">
-      {{ item.productInfo.title }}
-    </h3>
+    <router-link :to="{ name: 'product', params: { id: item.productInfo.id } }">
+      <h3 class="product__title">
+        {{ item.productInfo.title }}
+      </h3>
+    </router-link>
     <p class="product__info">Объем: <span>128GB</span></p>
     <span class="product__code"> Артикул: {{ item.productId }} </span>
 

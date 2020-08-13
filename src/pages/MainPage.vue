@@ -4,9 +4,7 @@
       <h1 class="content__title">
         Каталог
       </h1>
-      <span class="content__info">
-        152 товара
-      </span>
+      <span class="content__info"> {{ countProducts }} товаров </span>
     </div>
 
     <div class="content__catalog">
@@ -22,7 +20,8 @@
           Произошла ошибка при загрузке товаров
           <button @click.prevent="loadProducts">Попробовать еще раз</button>
         </div>
-        <ProductList :products="products" />
+        <ProductList v-show="countProducts > 0" :products="products" />
+        <div v-show="countProducts === 0">Ничего не найдено</div>
 
         <BaseProducts v-model="page" :count="countProducts" :per-page="productPerPage" />
       </section>
@@ -50,9 +49,10 @@ export default {
       filterPriceTo: 0,
       filterCategoryId: 0,
       filterColorId: 0,
-      productPerPage: 3,
+      productPerPage: 6,
       page: 1,
       productsData: null,
+      productsAllData: null,
       productsLoading: false,
       productsLoadingFailed: false,
     }
@@ -95,6 +95,18 @@ export default {
           })
           .then(() => {
             this.productsLoading = false
+          })
+        axios
+          .get(`${config}/api/products`, {
+            params: {
+              categoryId: this.filterCategoryId,
+              minPrice: this.filterPriceFrom,
+              maxPrice: this.filterPriceTo,
+              colorId: this.filterColorId,
+            },
+          })
+          .then((response) => {
+            this.productsAllData = response.data
           })
       }, 0)
     },
