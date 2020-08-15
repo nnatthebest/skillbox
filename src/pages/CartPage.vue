@@ -1,6 +1,6 @@
 <template>
   <main class="content container">
-    <div v-if="!cartProduct">
+    <div v-if="cartProduct.length === 0">
       Козина пуста. Добавьте товары для оформления заказа
       <router-link class="breadcrumbs__link" :to="{ name: 'main' }">
         Перейти на главную

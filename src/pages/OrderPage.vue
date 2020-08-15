@@ -44,6 +44,7 @@
               :error="formError.phone"
               placeholder="Введите ваш телефон"
               v-model="formData.phone"
+              mask="\+\7 (111) 111 11-11"
             />
             <BaseFormTextVue
               title="Email"
@@ -117,7 +118,7 @@
           <div class="cart__total">
             <p>Доставка: <b>500 ₽</b></p>
             <p>
-              Итого: <b>{{ cartProducts.length }}</b> товара на сумму <b>{{ orderTotalPrice }} ₽</b>
+              Итого: <b>{{ cartProducts.length }}</b> товара на сумму <b>{{ cartPrice }} ₽</b>
             </p>
           </div>
 
@@ -195,6 +196,7 @@ export default {
           .catch((error) => {
             this.formError = error.response.data.error.request || {}
             this.formErrorMessage = error.response.data.error.message
+            this.sendState = false
           })
       })
     },
